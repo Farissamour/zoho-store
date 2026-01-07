@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ZOHO Clothing Store</title>
 
 <style>
@@ -22,19 +23,32 @@ body.dark{
  --border:#333333;
 }
 
-/* ===== GLOBAL ===== */
+/* ===== BASE ===== */
 body{
  margin:0;
  font-family:Arial;
  background:var(--bg);
  color:var(--text);
+ transition:.3s;
  animation:fade .3s ease-in;
- transition:background .3s,color .3s;
 }
 @keyframes fade{from{opacity:0}to{opacity:1}}
 
-.page{display:none;padding:30px}
-.active{display:block}
+button{
+ cursor:pointer;
+ padding:8px 12px;
+ transition:.2s;
+}
+button:hover{transform:scale(1.05)}
+
+input{
+ padding:8px;
+ width:100%;
+ margin:5px 0;
+ background:var(--card);
+ color:var(--text);
+ border:1px solid var(--border);
+}
 
 /* ===== NAVBAR ===== */
 nav{
@@ -43,7 +57,7 @@ nav{
  align-items:center;
  padding:15px 30px;
  background:var(--nav);
- transition:background .3s;
+ flex-wrap:wrap;
 }
 .logo{
  font-size:28px;
@@ -54,27 +68,30 @@ nav span{
  cursor:pointer;
 }
 
-/* ===== BUTTON ===== */
-button{
- cursor:pointer;
- padding:8px 12px;
- border:none;
- border-radius:6px;
- transition:.2s;
+/* DARK MODE BUTTON */
+.theme-toggle{
+ background:none;
+ border:2px solid var(--text);
+ color:var(--text);
+ border-radius:20px;
+ font-size:16px;
+ padding:6px 14px;
 }
-button:hover{transform:scale(1.05)}
+
+/* ===== PAGES ===== */
+.page{display:none;padding:30px}
+.active{display:block}
 
 /* ===== PRODUCTS ===== */
 .products{
  display:grid;
  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
- gap:20px
+ gap:20px;
 }
 .product{
  background:var(--card);
  padding:15px;
  border-radius:10px;
- border:1px solid var(--border);
  transition:.3s;
 }
 .product:hover{transform:translateY(-6px)}
@@ -82,40 +99,43 @@ button:hover{transform:scale(1.05)}
  width:100%;
  height:230px;
  object-fit:cover;
- border-radius:8px
+ border-radius:8px;
 }
+
+/* ===== CART ===== */
+ul{padding-left:0}
+li{list-style:none;margin:8px 0}
 
 /* ===== TABLE ===== */
 table{
  width:100%;
  border-collapse:collapse;
- margin-top:15px
+ margin-top:15px;
 }
 th,td{
  padding:8px;
  border-bottom:1px solid var(--border);
- text-align:left
 }
 
-input{
- padding:8px;
- width:100%;
- margin:5px 0;
- background:var(--bg);
- color:var(--text);
- border:1px solid var(--border);
- border-radius:5px
-}
-
+/* ===== FOOTER ===== */
 footer{
  text-align:center;
- padding:15px
+ padding:15px;
 }
 
-/* ===== DARK TOGGLE ===== */
-.toggle{
- cursor:pointer;
- font-size:18px;
+/* ===== MOBILE FIX ===== */
+@media(max-width:600px){
+ nav{
+  flex-direction:column;
+  align-items:flex-start;
+ }
+ nav div{
+  margin-top:10px;
+ }
+ .theme-toggle{
+  width:100%;
+  margin-top:10px;
+ }
 }
 </style>
 </head>
@@ -130,7 +150,7 @@ footer{
   <span onclick="showPage('cart')">Cart (<span id="cartCount">0</span>)</span>
   <span onclick="showPage('orders')">Orders</span>
   <span onclick="showPage('contact')">Contact</span>
-  <span class="toggle" onclick="toggleDark()">🌙</span>
+  <button class="theme-toggle" onclick="toggleDark()">🌙</button>
  </div>
 </nav>
 
@@ -219,24 +239,23 @@ const products=[
  {name:"Cap",price:15,img:"https://images.unsplash.com/photo-1521369909029-2afed882baee"}
 ];
 
-let cart=[],discount=0,payment="",orders=JSON.parse(localStorage.getItem("orders"))||[];
+let cart=[],discount=0,payment="";
+let orders=JSON.parse(localStorage.getItem("orders"))||[];
 
 /* ===== DARK MODE ===== */
 function toggleDark(){
  document.body.classList.toggle("dark");
- localStorage.setItem("theme",
-  document.body.classList.contains("dark")?"dark":"light");
+ localStorage.setItem("theme",document.body.classList.contains("dark")?"dark":"light");
 }
-if(localStorage.getItem("theme")==="dark"){
- document.body.classList.add("dark");
-}
+if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark");
 
-/* ===== APP LOGIC ===== */
+/* ===== NAV ===== */
 function showPage(id){
  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
  document.getElementById(id).classList.add("active");
 }
 
+/* ===== PRODUCTS ===== */
 function renderProducts(list=products){
  productList.innerHTML="";
  list.forEach((p,i)=>{
@@ -250,6 +269,11 @@ function renderProducts(list=products){
  });
 }
 
+function search(v){
+ renderProducts(products.filter(p=>p.name.toLowerCase().includes(v.toLowerCase())));
+}
+
+/* ===== CART ===== */
 function addToCart(i){
  let f=cart.find(x=>x.name===products[i].name);
  f?f.qty++:cart.push({...products[i],qty:1});
@@ -257,12 +281,13 @@ function addToCart(i){
 }
 
 function updateCart(){
- let t=0;cartItems.innerHTML="";
+ let t=0;
+ cartItems.innerHTML="";
  cart.forEach((x,i)=>{
   t+=x.price*x.qty;
   cartItems.innerHTML+=`
    <li>${x.name}
-   <button onclick="chg(${i},-1)">-</button>${x.qty}
+   <button onclick="chg(${i},-1)">-</button> ${x.qty}
    <button onclick="chg(${i},1)">+</button>
    <button onclick="del(${i})">x</button></li>`;
  });
@@ -271,8 +296,15 @@ function updateCart(){
  cartCount.innerText=cart.length;
 }
 
-function chg(i,v){cart[i].qty+=v;if(cart[i].qty<=0)cart.splice(i,1);updateCart()}
-function del(i){cart.splice(i,1);updateCart()}
+function chg(i,v){
+ cart[i].qty+=v;
+ if(cart[i].qty<=0)cart.splice(i,1);
+ updateCart();
+}
+function del(i){
+ cart.splice(i,1);
+ updateCart();
+}
 
 function applyDiscount(){
  if(discountCode.value==="ZOHO10"){discount=0.1;alert("Discount applied")}
@@ -280,6 +312,7 @@ function applyDiscount(){
  updateCart();
 }
 
+/* ===== CHECKOUT ===== */
 function selectPay(p){
  payment=p;
  cardBox.style.display=p==="Card"?"block":"none";
@@ -293,6 +326,7 @@ function confirmOrder(){
   }
   processing.style.display="block";
  }
+
  setTimeout(()=>{
   processing.style.display="none";
   const id="ZOHO-"+Math.floor(Math.random()*999999);
@@ -316,16 +350,13 @@ function confirmOrder(){
  },payment==="Card"?1500:0);
 }
 
+/* ===== ORDERS ===== */
 function renderOrders(){
  orderHistory.innerHTML="";
  orders.forEach(o=>{
   orderHistory.innerHTML+=`
    <p><b>${o.id}</b> | ${o.payment} | $${o.total.toFixed(2)} | Items: ${o.count}<br>${o.date}</p><hr>`;
  });
-}
-
-function search(v){
- renderProducts(products.filter(p=>p.name.toLowerCase().includes(v.toLowerCase())));
 }
 
 renderProducts();
