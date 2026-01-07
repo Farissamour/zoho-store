@@ -6,7 +6,6 @@
 <title>ZOHO Clothing Store</title>
 
 <style>
-/* ================= THEME ================= */
 :root{
  --bg:#ffffff;
  --text:#000000;
@@ -32,7 +31,7 @@ body{
  transition:.3s;
 }
 
-/* ================= NAVBAR ================= */
+/* NAVBAR */
 nav{
  display:flex;
  justify-content:space-between;
@@ -53,16 +52,11 @@ nav span{margin-left:15px;cursor:pointer}
  cursor:pointer;
 }
 
-/* ================= PAGES ================= */
-.page{
- display:none;
- padding:30px;
- position:relative;
- z-index:1;
-}
+/* PAGES */
+.page{display:none;padding:30px}
 .active{display:block}
 
-/* ================= HERO ================= */
+/* HERO */
 .hero{
  display:flex;
  gap:40px;
@@ -70,13 +64,9 @@ nav span{margin-left:15px;cursor:pointer}
  justify-content:space-between;
  min-height:70vh;
 }
-.hero-text h1{font-size:56px;margin-bottom:15px}
-.hero-text p{font-size:20px;opacity:.8}
 .hero img{
- width:420px;
- height:520px;
- object-fit:cover;
- border-radius:25px;
+ width:420px;height:520px;
+ object-fit:cover;border-radius:25px;
  animation:float 3s ease-in-out infinite;
 }
 @keyframes float{
@@ -85,11 +75,7 @@ nav span{margin-left:15px;cursor:pointer}
  100%{transform:translateY(0)}
 }
 
-/* ================= FILTERS ================= */
-.filters{margin-bottom:20px}
-.filters button{margin-right:10px}
-
-/* ================= PRODUCTS ================= */
+/* PRODUCTS */
 .products{
  display:grid;
  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
@@ -104,15 +90,12 @@ nav span{margin-left:15px;cursor:pointer}
 }
 .product:hover{transform:translateY(-6px)}
 .product img{
- width:100%;
- height:230px;
- object-fit:cover;
- border-radius:12px;
+ width:100%;height:230px;
+ object-fit:cover;border-radius:12px;
 }
 .sale{
  position:absolute;
- top:10px;
- left:10px;
+ top:10px;left:10px;
  background:var(--sale);
  color:#fff;
  padding:5px 10px;
@@ -120,11 +103,11 @@ nav span{margin-left:15px;cursor:pointer}
  font-size:12px;
 }
 
-/* ================= CART ================= */
+/* CART */
 ul{padding-left:0}
 li{list-style:none;margin:10px 0}
 
-/* ================= BUTTON ================= */
+/* BUTTON */
 button{
  cursor:pointer;
  padding:8px 12px;
@@ -135,7 +118,7 @@ button{
 }
 body.dark button{background:#fff;color:#000}
 
-/* ================= MOBILE ================= */
+/* MOBILE */
 @media(max-width:800px){
  .hero{flex-direction:column;text-align:center}
  .hero img{width:100%;height:360px}
@@ -146,7 +129,6 @@ body.dark button{background:#fff;color:#000}
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
 <nav>
  <div class="logo">ZOHO</div>
  <div>
@@ -159,10 +141,10 @@ body.dark button{background:#fff;color:#000}
  </div>
 </nav>
 
-<!-- ================= HOME ================= -->
+<!-- HOME -->
 <div id="home" class="page active">
  <div class="hero">
-  <div class="hero-text">
+  <div>
    <h1>ZOHO Fashion</h1>
    <p>Modern styles. Premium quality. Everyday confidence.</p>
    <button onclick="showPage('products')">Shop Now</button>
@@ -171,19 +153,13 @@ body.dark button{background:#fff;color:#000}
  </div>
 </div>
 
-<!-- ================= PRODUCTS ================= -->
+<!-- PRODUCTS -->
 <div id="products" class="page">
  <input placeholder="Search..." oninput="search(this.value)">
- <div class="filters">
-  <button onclick="filterCategory('All')">All</button>
-  <button onclick="filterCategory('Clothes')">Clothes</button>
-  <button onclick="filterCategory('Shoes')">Shoes</button>
-  <button onclick="filterCategory('Accessories')">Accessories</button>
- </div>
  <div class="products" id="productList"></div>
 </div>
 
-<!-- ================= CART ================= -->
+<!-- CART -->
 <div id="cart" class="page">
  <h2>Your Cart</h2>
  <ul id="cartItems"></ul>
@@ -193,43 +169,36 @@ body.dark button{background:#fff;color:#000}
  <button onclick="showPage('checkout')">Checkout</button>
 </div>
 
-<!-- ================= CHECKOUT ================= -->
+<!-- CHECKOUT -->
 <div id="checkout" class="page">
  <h2>Payment Method</h2>
  <label><input type="radio" name="pay" onclick="selectPay('Card')"> Card</label><br>
  <label><input type="radio" name="pay" onclick="selectPay('Cash on Delivery')"> Cash on Delivery</label>
-
  <div id="cardBox" style="display:none">
   <input id="cardNumber" placeholder="Card Number (16 digits)">
   <input id="expiry" placeholder="MM/YY">
   <input id="cvv" placeholder="CVV">
  </div>
-
  <button onclick="confirmOrder()">Confirm Order</button>
 </div>
 
-<!-- ================= CONFIRMATION ================= -->
+<!-- CONFIRMATION -->
 <div id="confirmation" class="page">
  <h2>Order Confirmed ✅</h2>
  <p><b>Order ID:</b> <span id="orderId"></span></p>
  <p><b>Payment:</b> <span id="paymentMethod"></span></p>
- <table>
-  <thead>
-   <tr><th>Item</th><th>Qty</th><th>Total</th></tr>
-  </thead>
-  <tbody id="invoice"></tbody>
- </table>
+ <table><tbody id="invoice"></tbody></table>
  <h3>Total Paid: $<span id="paidTotal"></span></h3>
  <button onclick="window.print()">🖨 Print Invoice</button>
 </div>
 
-<!-- ================= ORDERS ================= -->
+<!-- ORDERS -->
 <div id="orders" class="page">
  <h2>Order History</h2>
  <div id="orderHistory"></div>
 </div>
 
-<!-- ================= CONTACT ================= -->
+<!-- CONTACT -->
 <div id="contact" class="page">
  <h2>Contact</h2>
  <p>📱 0791566136</p>
@@ -237,40 +206,34 @@ body.dark button{background:#fff;color:#000}
 </div>
 
 <script>
-/* ================= DATA ================= */
+/* DATA */
 const products=[
- {name:"T-Shirt",price:20,oldPrice:30,cat:"Clothes",sale:true,img:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab"},
+ {name:"T-Shirt",price:20,cat:"Clothes",sale:true,img:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab"},
  {name:"Hoodie",price:40,cat:"Clothes",sale:false,img:"https://images.unsplash.com/photo-1556821840-3a63f95609a7"},
- {name:"Jacket",price:60,oldPrice:80,cat:"Clothes",sale:true,img:"https://images.unsplash.com/photo-1520975916090-3105956dac38"},
+ {name:"Jacket",price:60,cat:"Clothes",sale:true,img:"https://images.unsplash.com/photo-1520975916090-3105956dac38"},
  {name:"Jeans",price:35,cat:"Clothes",sale:false,img:"https://images.unsplash.com/photo-1542272604-787c3835535d"},
  {name:"Sneakers",price:55,cat:"Shoes",sale:false,img:"https://images.unsplash.com/photo-1514989940723-e8e51635b782"},
- {name:"Shoes",price:50,oldPrice:70,cat:"Shoes",sale:true,img:"https://images.unsplash.com/photo-1549298916-b41d501d3772"},
+ {name:"Shoes",price:50,cat:"Shoes",sale:true,img:"https://images.unsplash.com/photo-1549298916-b41d501d3772"},
  {name:"Sweatpants",price:30,cat:"Clothes",sale:false,img:"https://images.pexels.com/photos/6311393/pexels-photo-6311393.jpeg"},
  {name:"Cap",price:15,cat:"Accessories",sale:false,img:"https://images.unsplash.com/photo-1521369909029-2afed882baee"},
- {name:"Backpack",price:45,oldPrice:65,cat:"Accessories",sale:true,img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62"}
+ {name:"Backpack",price:45,cat:"Accessories",sale:true,img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62"}
 ];
 
-let cart=[],discount=0,payment="",orders=JSON.parse(localStorage.getItem("orders"))||[];
+let cart=[],discount=0,payment="",orders=[];
 
-/* ================= NAV ================= */
+/* NAV */
 function showPage(id){
  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
  document.getElementById(id).classList.add("active");
 }
 
-/* ================= DARK MODE ================= */
+/* DARK MODE */
 function toggleDark(){
  document.body.classList.toggle("dark");
- const d=document.body.classList.contains("dark");
- themeBtn.innerText=d?"☀️":"🌙";
- localStorage.setItem("theme",d?"dark":"light");
-}
-if(localStorage.getItem("theme")==="dark"){
- document.body.classList.add("dark");
- themeBtn.innerText="☀️";
+ themeBtn.innerText=document.body.classList.contains("dark")?"☀️":"🌙";
 }
 
-/* ================= PRODUCTS ================= */
+/* PRODUCTS */
 function renderProducts(list=products){
  productList.innerHTML="";
  list.forEach((p,i)=>{
@@ -279,7 +242,12 @@ function renderProducts(list=products){
     ${p.sale?'<div class="sale">SALE</div>':''}
     <img src="${p.img}">
     <h3>${p.name}</h3>
-    <p>$${p.price}</p>
+    <p>
+      ${p.sale
+        ? `<del>$30</del> <ins style="color:#e63946;font-weight:bold">$${p.price}</ins>`
+        : `$${p.price}`
+      }
+    </p>
     <button onclick="addToCart(${i})">Add to Cart</button>
    </div>`;
  });
@@ -287,11 +255,8 @@ function renderProducts(list=products){
 function search(v){
  renderProducts(products.filter(p=>p.name.toLowerCase().includes(v.toLowerCase())));
 }
-function filterCategory(c){
- c==="All"?renderProducts():renderProducts(products.filter(p=>p.cat===c));
-}
 
-/* ================= CART ================= */
+/* CART */
 function addToCart(i){
  let f=cart.find(x=>x.name===products[i].name);
  f?f.qty++:cart.push({...products[i],qty:1});
@@ -314,14 +279,13 @@ function updateCart(){
 }
 function chg(i,v){cart[i].qty+=v;if(cart[i].qty<=0)cart.splice(i,1);updateCart()}
 function del(i){cart.splice(i,1);updateCart()}
-
 function applyDiscount(){
  if(discountCode.value==="ZOHO10"){discount=0.1;alert("Discount applied")}
  else alert("Invalid code");
  updateCart();
 }
 
-/* ================= CHECKOUT ================= */
+/* CHECKOUT */
 function selectPay(p){
  payment=p;
  cardBox.style.display=p==="Card"?"block":"none";
@@ -330,37 +294,21 @@ function confirmOrder(){
  if(!payment){alert("Select payment");return;}
  const id="ZOHO-"+Math.floor(Math.random()*999999);
  const totalPaid=cart.reduce((s,x)=>s+x.price*x.qty,0)*(1-discount);
-
  invoice.innerHTML=cart.map(x=>`
   <tr><td>${x.name}</td><td>${x.qty}</td><td>$${(x.price*x.qty).toFixed(2)}</td></tr>`).join("");
-
  orderId.innerText=id;
  paymentMethod.innerText=payment;
  paidTotal.innerText=totalPaid.toFixed(2);
-
- orders.push({id,total:totalPaid,payment,date:new Date().toLocaleString()});
- localStorage.setItem("orders",JSON.stringify(orders));
-
- cart=[];discount=0;updateCart();renderOrders();
+ cart=[];discount=0;updateCart();
  showPage("confirmation");
 }
 
-/* ================= ORDERS ================= */
-function renderOrders(){
- orderHistory.innerHTML="";
- orders.forEach(o=>{
-  orderHistory.innerHTML+=`
-   <p><b>${o.id}</b> | $${o.total.toFixed(2)} | ${o.payment}<br>${o.date}</p><hr>`;
- });
-}
-
-/* ================= HERO SLIDER ================= */
+/* HERO SLIDER */
 const heroImages=products.slice(0,4).map(p=>p.img);
 let hi=0;
 setInterval(()=>{hi=(hi+1)%heroImages.length;heroImage.src=heroImages[hi]},3000);
 
 renderProducts();
-renderOrders();
 </script>
 
 </body>
