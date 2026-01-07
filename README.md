@@ -1,1 +1,261 @@
 index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ZOHO Clothing Store</title>
+
+<style>
+body{
+ margin:0;font-family:Arial;background:#fff;color:#000;
+ animation:fade .3s ease-in;
+}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+nav{
+ display:flex;justify-content:space-between;
+ padding:15px 30px;background:#eee
+}
+.logo{font-size:28px;font-weight:bold}
+nav span{margin-left:15px;cursor:pointer}
+
+button{
+ cursor:pointer;
+ padding:8px 12px;
+ transition:.2s;
+}
+button:hover{transform:scale(1.05)}
+
+.page{display:none;padding:30px}
+.active{display:block}
+
+.products{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+ gap:20px
+}
+.product{
+ background:#f2f2f2;
+ padding:15px;border-radius:10px
+}
+.product img{
+ width:100%;height:230px;
+ object-fit:cover;border-radius:8px
+}
+
+table{
+ width:100%;border-collapse:collapse;margin-top:15px
+}
+th,td{
+ padding:8px;border-bottom:1px solid #ccc;text-align:left
+}
+input{
+ padding:8px;width:100%;margin:5px 0
+}
+footer{text-align:center;padding:15px}
+</style>
+</head>
+
+<body>
+
+<nav>
+ <div class="logo">ZOHO</div>
+ <div>
+  <span onclick="showPage('home')">Home</span>
+  <span onclick="showPage('products')">Products</span>
+  <span onclick="showPage('cart')">Cart (<span id="cartCount">0</span>)</span>
+  <span onclick="showPage('orders')">Orders</span>
+  <span onclick="showPage('contact')">Contact</span>
+ </div>
+</nav>
+
+<!-- HOME -->
+<div id="home" class="page active" style="text-align:center">
+ <h1 style="font-size:60px">ZOHO</h1>
+</div>
+
+<!-- PRODUCTS -->
+<div id="products" class="page">
+<input placeholder="Search..." oninput="search(this.value)">
+<div class="products" id="productList"></div>
+</div>
+
+<!-- CART -->
+<div id="cart" class="page">
+<h2>Cart</h2>
+<ul id="cartItems"></ul>
+<h3>Total: $<span id="total">0</span></h3>
+<input id="discountCode" placeholder="Discount code (ZOHO10)">
+<button onclick="applyDiscount()">Apply</button><br><br>
+<button onclick="showPage('checkout')">Checkout</button>
+</div>
+
+<!-- CHECKOUT -->
+<div id="checkout" class="page">
+<h2>Payment Method</h2>
+
+<label><input type="radio" name="pay" onclick="selectPay('Card')"> Card</label><br>
+<label><input type="radio" name="pay" onclick="selectPay('Cash on Delivery')"> Cash on Delivery</label>
+
+<div id="cardBox" style="display:none">
+ <input id="cardName" placeholder="Cardholder Name">
+ <input id="cardNumber" placeholder="Card Number (16 digits)">
+ <input id="expiry" placeholder="MM/YY">
+ <input id="cvv" placeholder="CVV">
+</div>
+
+<p id="processing" style="display:none;color:green">Processing payment...</p>
+<br>
+<button onclick="confirmOrder()">Confirm Order</button>
+</div>
+
+<!-- CONFIRMATION -->
+<div id="confirmation" class="page">
+<h2>Order Confirmed ✅</h2>
+<p><b>Order ID:</b> <span id="orderId"></span></p>
+<p><b>Date:</b> <span id="orderDate"></span></p>
+<p><b>Payment:</b> <span id="paymentMethod"></span></p>
+
+<table>
+<thead>
+<tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+</thead>
+<tbody id="invoice"></tbody>
+</table>
+
+<h3>Total Paid: $<span id="paidTotal"></span></h3>
+<button onclick="window.print()">🖨 Print Invoice</button>
+</div>
+
+<!-- ORDERS -->
+<div id="orders" class="page">
+<h2>Order History</h2>
+<div id="orderHistory"></div>
+</div>
+
+<!-- CONTACT -->
+<div id="contact" class="page">
+<h2>Contact</h2>
+<p>📱 0791566136</p>
+<p>📧 farissamour634@gmail.com</p>
+</div>
+
+<footer>© 2026 ZOHO</footer>
+
+<script>
+const products=[
+ {name:"T-Shirt",price:20,img:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab"},
+ {name:"Hoodie",price:40,img:"https://images.unsplash.com/photo-1556821840-3a63f95609a7"},
+ {name:"Jacket",price:60,img:"https://images.unsplash.com/photo-1520975916090-3105956dac38"},
+ {name:"Jeans",price:35,img:"https://images.unsplash.com/photo-1542272604-787c3835535d"},
+ {name:"Shoes",price:50,img:"https://images.unsplash.com/photo-1549298916-b41d501d3772"},
+ {name:"Sweatpants",price:30,img:"https://images.unsplash.com/photo-1618354691373-d851c5c3a990"},
+ {name:"Sneakers",price:55,img:"https://images.unsplash.com/photo-1514989940723-e8e51635b782"},
+ {name:"Cap",price:15,img:"https://images.unsplash.com/photo-1521369909029-2afed882baee"}
+];
+
+let cart=[],discount=0,payment="",orders=JSON.parse(localStorage.getItem("orders"))||[];
+
+function showPage(id){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+}
+
+function renderProducts(list=products){
+ productList.innerHTML="";
+ list.forEach((p,i)=>{
+  productList.innerHTML+=`
+   <div class="product">
+    <img src="${p.img}">
+    <h3>${p.name}</h3>
+    <p>$${p.price}</p>
+    <button onclick="addToCart(${i})">Add to Cart</button>
+   </div>`;
+ });
+}
+
+function addToCart(i){
+ let f=cart.find(x=>x.name===products[i].name);
+ f?f.qty++:cart.push({...products[i],qty:1});
+ updateCart();
+}
+
+function updateCart(){
+ let t=0;cartItems.innerHTML="";
+ cart.forEach((x,i)=>{
+  t+=x.price*x.qty;
+  cartItems.innerHTML+=`
+   <li>${x.name}
+   <button onclick="chg(${i},-1)">-</button>${x.qty}
+   <button onclick="chg(${i},1)">+</button>
+   <button onclick="del(${i})">x</button></li>`;
+ });
+ t-=t*discount;
+ total.innerText=t.toFixed(2);
+ cartCount.innerText=cart.length;
+}
+
+function chg(i,v){cart[i].qty+=v;if(cart[i].qty<=0)cart.splice(i,1);updateCart()}
+function del(i){cart.splice(i,1);updateCart()}
+
+function applyDiscount(){
+ if(discountCode.value==="ZOHO10"){discount=0.1;alert("Discount applied")}
+ else alert("Invalid code");
+ updateCart();
+}
+
+function selectPay(p){
+ payment=p;
+ cardBox.style.display=p==="Card"?"block":"none";
+}
+
+function confirmOrder(){
+ if(!payment){alert("Select payment");return;}
+ if(payment==="Card"){
+  if(cardNumber.value.length!==16||cvv.value.length!==3||!expiry.value.includes("/")){
+   alert("Invalid card info");return;
+  }
+  processing.style.display="block";
+ }
+
+ setTimeout(()=>{
+  processing.style.display="none";
+  const id="ZOHO-"+Math.floor(Math.random()*999999);
+  const date=new Date().toLocaleString();
+  const totalPaid=cart.reduce((s,x)=>s+x.price*x.qty,0)*(1-discount);
+
+  orders.push({id,date,payment,total:totalPaid,count:cart.length});
+  localStorage.setItem("orders",JSON.stringify(orders));
+
+  invoice.innerHTML=cart.map(x=>`
+   <tr><td>${x.name}</td><td>${x.qty}</td>
+   <td>$${x.price}</td><td>$${(x.price*x.qty).toFixed(2)}</td></tr>`).join("");
+
+  orderId.innerText=id;
+  orderDate.innerText=date;
+  paymentMethod.innerText=payment;
+  paidTotal.innerText=totalPaid.toFixed(2);
+
+  cart=[];discount=0;updateCart();renderOrders();
+  showPage("confirmation");
+ },payment==="Card"?1500:0);
+}
+
+function renderOrders(){
+ orderHistory.innerHTML="";
+ orders.forEach(o=>{
+  orderHistory.innerHTML+=`
+   <p><b>${o.id}</b> | ${o.payment} | $${o.total.toFixed(2)} | Items: ${o.count}<br>${o.date}</p><hr>`;
+ });
+}
+
+function search(v){
+ renderProducts(products.filter(p=>p.name.toLowerCase().includes(v.toLowerCase())));
+}
+
+renderProducts();
+renderOrders();
+</script>
+
+</body>
+</html>
