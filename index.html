@@ -11,21 +11,18 @@
  --text:#000000;
  --nav:#eeeeee;
  --card:#f2f2f2;
- --border:#cccccc;
- --sale:#e63946;
 }
 body.dark{
  --bg:#121212;
  --text:#ffffff;
  --nav:#1e1e1e;
  --card:#1f1f1f;
- --border:#333;
 }
 
 *{box-sizing:border-box}
 body{
  margin:0;
- font-family:Arial, sans-serif;
+ font-family:Arial,Helvetica,sans-serif;
  background:var(--bg);
  color:var(--text);
  transition:.3s;
@@ -36,20 +33,20 @@ nav{
  display:flex;
  justify-content:space-between;
  align-items:center;
- padding:15px 30px;
+ padding:15px 25px;
  background:var(--nav);
- position:relative;
- z-index:1000;
 }
-.logo{font-size:28px;font-weight:bold}
-nav span{margin-left:15px;cursor:pointer}
-.theme-toggle{
- border:2px solid var(--text);
- background:none;
- color:var(--text);
- border-radius:20px;
- padding:6px 14px;
+.logo{
+ font-size:28px;
+ font-weight:bold;
+}
+nav span, nav button{
+ margin-left:15px;
  cursor:pointer;
+ background:none;
+ border:none;
+ color:var(--text);
+ font-size:16px;
 }
 
 /* PAGES */
@@ -59,19 +56,23 @@ nav span{margin-left:15px;cursor:pointer}
 /* HERO */
 .hero{
  display:flex;
- gap:40px;
  align-items:center;
  justify-content:space-between;
+ gap:40px;
  min-height:70vh;
+ padding:40px;
 }
+.hero-text{max-width:450px}
 .hero img{
- width:420px;height:520px;
- object-fit:cover;border-radius:25px;
+ width:420px;
+ height:520px;
+ object-fit:cover;
+ border-radius:25px;
  animation:float 3s ease-in-out infinite;
 }
 @keyframes float{
  0%{transform:translateY(0)}
- 50%{transform:translateY(-15px)}
+ 50%{transform:translateY(-20px)}
  100%{transform:translateY(0)}
 }
 
@@ -84,30 +85,18 @@ nav span{margin-left:15px;cursor:pointer}
 .product{
  background:var(--card);
  padding:15px;
- border-radius:15px;
- position:relative;
- transition:.3s;
+ border-radius:12px;
+ transition:.2s;
 }
-.product:hover{transform:translateY(-6px)}
+.product:hover{transform:translateY(-5px)}
 .product img{
- width:100%;height:230px;
- object-fit:cover;border-radius:12px;
-}
-.sale{
- position:absolute;
- top:10px;left:10px;
- background:var(--sale);
- color:#fff;
- padding:5px 10px;
- border-radius:20px;
- font-size:12px;
+ width:100%;
+ height:230px;
+ object-fit:cover;
+ border-radius:10px;
 }
 
-/* CART */
-ul{padding-left:0}
-li{list-style:none;margin:10px 0}
-
-/* BUTTON */
+/* BUTTONS */
 button{
  cursor:pointer;
  padding:8px 12px;
@@ -115,14 +104,44 @@ button{
  border-radius:6px;
  background:#000;
  color:#fff;
+ transition:.2s;
 }
+button:hover{transform:scale(1.05)}
 body.dark button{background:#fff;color:#000}
+
+/* CART */
+ul{padding-left:0}
+li{list-style:none;margin:10px 0}
+
+/* TABLE */
+table{
+ width:100%;
+ border-collapse:collapse;
+ margin-top:15px;
+}
+th,td{
+ padding:8px;
+ border-bottom:1px solid #ccc;
+ text-align:left;
+}
+
+/* INPUT */
+input{
+ width:100%;
+ padding:8px;
+ margin:5px 0;
+}
 
 /* MOBILE */
 @media(max-width:800px){
- .hero{flex-direction:column;text-align:center}
- .hero img{width:100%;height:360px}
- nav{flex-direction:column;align-items:flex-start}
+ .hero{
+  flex-direction:column;
+  text-align:center;
+ }
+ .hero img{
+  width:100%;
+  height:360px;
+ }
 }
 </style>
 </head>
@@ -137,19 +156,19 @@ body.dark button{background:#fff;color:#000}
   <span onclick="showPage('cart')">Cart (<span id="cartCount">0</span>)</span>
   <span onclick="showPage('orders')">Orders</span>
   <span onclick="showPage('contact')">Contact</span>
-  <button class="theme-toggle" id="themeBtn" onclick="toggleDark()">🌙</button>
+  <button id="themeBtn" onclick="toggleDark()">🌙</button>
  </div>
 </nav>
 
 <!-- HOME -->
 <div id="home" class="page active">
  <div class="hero">
-  <div>
-   <h1>ZOHO Fashion</h1>
+  <div class="hero-text">
+   <h1 style="font-size:60px">ZOHO</h1>
    <p>Modern styles. Premium quality. Everyday confidence.</p>
    <button onclick="showPage('products')">Shop Now</button>
   </div>
-  <img id="heroImage" src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab">
+  <img id="heroImage">
  </div>
 </div>
 
@@ -161,7 +180,7 @@ body.dark button{background:#fff;color:#000}
 
 <!-- CART -->
 <div id="cart" class="page">
- <h2>Your Cart</h2>
+ <h2>Cart</h2>
  <ul id="cartItems"></ul>
  <h3>Total: $<span id="total">0</span></h3>
  <input id="discountCode" placeholder="Discount code (ZOHO10)">
@@ -171,14 +190,16 @@ body.dark button{background:#fff;color:#000}
 
 <!-- CHECKOUT -->
 <div id="checkout" class="page">
- <h2>Payment Method</h2>
+ <h2>Payment</h2>
  <label><input type="radio" name="pay" onclick="selectPay('Card')"> Card</label><br>
  <label><input type="radio" name="pay" onclick="selectPay('Cash on Delivery')"> Cash on Delivery</label>
+
  <div id="cardBox" style="display:none">
   <input id="cardNumber" placeholder="Card Number (16 digits)">
   <input id="expiry" placeholder="MM/YY">
   <input id="cvv" placeholder="CVV">
  </div>
+
  <button onclick="confirmOrder()">Confirm Order</button>
 </div>
 
@@ -186,10 +207,17 @@ body.dark button{background:#fff;color:#000}
 <div id="confirmation" class="page">
  <h2>Order Confirmed ✅</h2>
  <p><b>Order ID:</b> <span id="orderId"></span></p>
+ <p><b>Date:</b> <span id="orderDate"></span></p>
  <p><b>Payment:</b> <span id="paymentMethod"></span></p>
- <table><tbody id="invoice"></tbody></table>
+
+ <table>
+  <thead>
+   <tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+  </thead>
+  <tbody id="invoice"></tbody>
+ </table>
+
  <h3>Total Paid: $<span id="paidTotal"></span></h3>
- <button onclick="window.print()">🖨 Print Invoice</button>
 </div>
 
 <!-- ORDERS -->
@@ -206,20 +234,20 @@ body.dark button{background:#fff;color:#000}
 </div>
 
 <script>
-/* DATA */
 const products=[
- {name:"T-Shirt",price:20,cat:"Clothes",sale:true,img:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab"},
- {name:"Hoodie",price:40,cat:"Clothes",sale:false,img:"https://images.unsplash.com/photo-1556821840-3a63f95609a7"},
- {name:"Jacket",price:60,cat:"Clothes",sale:true,img:"https://images.unsplash.com/photo-1520975916090-3105956dac38"},
- {name:"Jeans",price:35,cat:"Clothes",sale:false,img:"https://images.unsplash.com/photo-1542272604-787c3835535d"},
- {name:"Sneakers",price:55,cat:"Shoes",sale:false,img:"https://images.unsplash.com/photo-1514989940723-e8e51635b782"},
- {name:"Shoes",price:50,cat:"Shoes",sale:true,img:"https://images.unsplash.com/photo-1549298916-b41d501d3772"},
- {name:"Sweatpants",price:30,cat:"Clothes",sale:false,img:"https://images.pexels.com/photos/6311393/pexels-photo-6311393.jpeg"},
- {name:"Cap",price:15,cat:"Accessories",sale:false,img:"https://images.unsplash.com/photo-1521369909029-2afed882baee"},
- {name:"Backpack",price:45,cat:"Accessories",sale:true,img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62"}
+ {name:"T-Shirt",price:20,oldPrice:30,sale:true,img:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab"},
+ {name:"Hoodie",price:40,sale:false,img:"https://images.unsplash.com/photo-1556821840-3a63f95609a7"},
+ {name:"Jacket",price:45,oldPrice:60,sale:true,img:"https://images.unsplash.com/photo-1520975916090-3105956dac38"},
+ {name:"Jeans",price:35,sale:false,img:"https://images.unsplash.com/photo-1542272604-787c3835535d"},
+ {name:"Shoes",price:40,oldPrice:55,sale:true,img:"https://images.unsplash.com/photo-1549298916-b41d501d3772"},
+ {name:"Sneakers",price:55,sale:false,img:"https://images.unsplash.com/photo-1514989940723-e8e51635b782"},
+ {name:"Sweatpants",price:30,sale:false,img:"https://images.pexels.com/photos/6311393/pexels-photo-6311393.jpeg"},
+ {name:"Cap",price:15,sale:false,img:"https://images.unsplash.com/photo-1521369909029-2afed882baee"},
+ {name:"Backpack",price:20,oldPrice:35,sale:true,img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62"}
 ];
 
-let cart=[],discount=0,payment="",orders=[];
+let cart=[],discount=0,payment="";
+let orders=JSON.parse(localStorage.getItem("orders"))||[];
 
 /* NAV */
 function showPage(id){
@@ -239,21 +267,12 @@ function renderProducts(list=products){
  list.forEach((p,i)=>{
   productList.innerHTML+=`
    <div class="product">
-    ${p.sale?'<div class="sale">SALE</div>':''}
     <img src="${p.img}">
     <h3>${p.name}</h3>
-    <p>
-      ${p.sale
-        ? `<del>$30</del> <ins style="color:#e63946;font-weight:bold">$${p.price}</ins>`
-        : `$${p.price}`
-      }
-    </p>
+    <p>${p.sale?`<del>$${p.oldPrice}</del> <ins>$${p.price}</ins>`:`$${p.price}`}</p>
     <button onclick="addToCart(${i})">Add to Cart</button>
    </div>`;
  });
-}
-function search(v){
- renderProducts(products.filter(p=>p.name.toLowerCase().includes(v.toLowerCase())));
 }
 
 /* CART */
@@ -263,15 +282,15 @@ function addToCart(i){
  updateCart();
 }
 function updateCart(){
- let t=0;
- cartItems.innerHTML="";
+ let t=0;cartItems.innerHTML="";
  cart.forEach((x,i)=>{
   t+=x.price*x.qty;
   cartItems.innerHTML+=`
    <li>${x.name}
-   <button onclick="chg(${i},-1)">-</button> ${x.qty}
-   <button onclick="chg(${i},1)">+</button>
-   <button onclick="del(${i})">x</button></li>`;
+    <button onclick="chg(${i},-1)">-</button> ${x.qty}
+    <button onclick="chg(${i},1)">+</button>
+    <button onclick="del(${i})">x</button>
+   </li>`;
  });
  t-=t*discount;
  total.innerText=t.toFixed(2);
@@ -280,7 +299,7 @@ function updateCart(){
 function chg(i,v){cart[i].qty+=v;if(cart[i].qty<=0)cart.splice(i,1);updateCart()}
 function del(i){cart.splice(i,1);updateCart()}
 function applyDiscount(){
- if(discountCode.value==="ZOHO10"){discount=0.1;alert("Discount applied")}
+ if(discountCode.value==="ZOHO10"){discount=.1;alert("Discount applied")}
  else alert("Invalid code");
  updateCart();
 }
@@ -293,22 +312,51 @@ function selectPay(p){
 function confirmOrder(){
  if(!payment){alert("Select payment");return;}
  const id="ZOHO-"+Math.floor(Math.random()*999999);
+ const date=new Date().toLocaleString();
  const totalPaid=cart.reduce((s,x)=>s+x.price*x.qty,0)*(1-discount);
+
  invoice.innerHTML=cart.map(x=>`
-  <tr><td>${x.name}</td><td>${x.qty}</td><td>$${(x.price*x.qty).toFixed(2)}</td></tr>`).join("");
+  <tr><td>${x.name}</td><td>${x.qty}</td>
+  <td>$${x.price}</td><td>$${(x.price*x.qty).toFixed(2)}</td></tr>`).join("");
+
  orderId.innerText=id;
+ orderDate.innerText=date;
  paymentMethod.innerText=payment;
  paidTotal.innerText=totalPaid.toFixed(2);
- cart=[];discount=0;updateCart();
+
+ orders.push({id,date,payment,total:totalPaid});
+ localStorage.setItem("orders",JSON.stringify(orders));
+
+ cart=[];discount=0;updateCart();renderOrders();
  showPage("confirmation");
 }
 
-/* HERO SLIDER */
-const heroImages=products.slice(0,4).map(p=>p.img);
-let hi=0;
-setInterval(()=>{hi=(hi+1)%heroImages.length;heroImage.src=heroImages[hi]},3000);
+/* ORDERS */
+function renderOrders(){
+ orderHistory.innerHTML="";
+ orders.forEach(o=>{
+  orderHistory.innerHTML+=`
+   <p><b>${o.id}</b> | ${o.payment} | $${o.total.toFixed(2)}<br>${o.date}</p><hr>`;
+ });
+}
 
+/* SEARCH */
+function search(v){
+ renderProducts(products.filter(p=>p.name.toLowerCase().includes(v.toLowerCase())));
+}
+
+/* HERO SLIDER */
+const heroImgs=products.slice(0,4).map(p=>p.img);
+let hi=0;
+heroImage.src=heroImgs[0];
+setInterval(()=>{
+ hi=(hi+1)%heroImgs.length;
+ heroImage.src=heroImgs[hi];
+},3000);
+
+/* INIT */
 renderProducts();
+renderOrders();
 </script>
 
 </body>
